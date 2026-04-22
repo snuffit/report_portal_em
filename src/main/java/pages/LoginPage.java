@@ -7,30 +7,37 @@ import static com.codeborne.selenide.Selenide.open;
 
 public class LoginPage {
 
-    private final String URI = "https://demo.reportportal.io/ui/#login",
-            LOGIN = "login",
-            PASSWORD = "password",
-            CSS_BUTTON_LOGIN = "[type=submit]";
+    // URLs
+    private static final String URL_LOGIN = "https://demo.reportportal.io/ui/#login";
 
-    public void openPage() {
-        open(URI);
+    // Locators
+    private static final By USERNAME_INPUT = By.name("login");
+    private static final By PASSWORD_INPUT = By.name("password");
+    private static final By LOGIN_BUTTON = By.cssSelector("button[type='submit']");
+
+    public LoginPage openPage() {
+        open(URL_LOGIN);
+        return this;
     }
 
-    public void auth(String login, String password) {
-        inputLogin(login);
-        inputPassword(password);
-        clickLogin();
+    public LaunchesPage auth(String login, String password) {
+        return inputLogin(login)
+                .inputPassword(password)
+                .clickLogin();
     }
 
-    private void inputLogin(String login) {
-        $(By.name(LOGIN)).setValue(login);
+    private LoginPage inputLogin(String login) {
+        $(USERNAME_INPUT).setValue(login);
+        return this;
     }
 
-    private void inputPassword(String password) {
-        $(By.name(PASSWORD)).setValue(password);
+    private LoginPage inputPassword(String password) {
+        $(PASSWORD_INPUT).setValue(password);
+        return this;
     }
 
-    private void clickLogin() {
-        $(CSS_BUTTON_LOGIN).click();
+    private LaunchesPage clickLogin() {
+        $(LOGIN_BUTTON).click();
+        return new LaunchesPage();
     }
 }

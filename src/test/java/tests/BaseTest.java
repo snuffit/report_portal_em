@@ -5,24 +5,45 @@ import com.codeborne.selenide.WebDriverRunner;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
-import pages.LoginPage;
+import pages.LaunchesPage;
+import steps.api.LaunchesApiSteps;
+import steps.ui.LoginStep;
 
 public class BaseTest {
 
-    protected static WebDriver driver;
-    protected static LoginPage loginPage;
+    protected WebDriver driver;
+    protected LoginStep loginStep;
+    protected LaunchesApiSteps launchesApiSteps;
+    protected LaunchesPage launchesPage;
 
     @BeforeMethod(alwaysRun = true, description = "Open browser")
     public void setup() {
         Configuration.timeout = 20000;
         Configuration.clickViaJs = true;
         Configuration.browserSize = null;
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--start-maximized");
-        options.addArguments("--incognito");
-        driver = new ChromeDriver(options);
-        WebDriverRunner.setWebDriver(driver);
-        loginPage = new LoginPage();
+        launchesApiSteps = new LaunchesApiSteps();
+
+        if (requiresUiSession()) {
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("--start-maximized");
+            options.addArguments("--incognito");
+            driver = new ChromeDriver(options);
+            WebDriverRunner.setWebDriver(driver);
+            loginStep = new LoginStep();
+            launchesPage = new LaunchesPage();
+        }
+    }
+
+    @AfterMethod(alwaysRun = true, description = "Close browser")
+    public void tearDown() {
+        if (driver != null) {
+            driver.quit();
+        }
+    }
+
+    private boolean requiresUiSession() {
+        return getClass().getPackageName().contains(".ui");
     }
 }

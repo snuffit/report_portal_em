@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="ReportPortalSuiteParallel" parallel="tests" thread-count="2">
+    <test name="API Tests Parallel">
+        <classes>
+            <class name="tests.api.LaunchesCrudApiTest"/>
+        </classes>
+    </test>
+    <test name="UI Tests Parallel">
+        <classes>
+            <class name="tests.ui.LaunchesTest"/>
+        </classes>
+    </test>
+</suite>
