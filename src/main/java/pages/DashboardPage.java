@@ -1,6 +1,7 @@
 package pages;
 
 import com.codeborne.selenide.Condition;
+import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import com.codeborne.selenide.WebDriverRunner;
 import org.openqa.selenium.By;
@@ -47,9 +48,11 @@ public class DashboardPage extends BasePage {
             clickElementIfVisible(TEXT_CREATE);
         }
 
-        SelenideElement dashboardLink = $$(DASHBOARD_LINKS)
-                .findBy(Condition.not(Condition.attribute("href", PATH_DASHBOARD)));
-        if (dashboardLink.exists()) {
+        ElementsCollection dashboardLinks = $$(DASHBOARD_LINKS)
+                .filter(Condition.visible)
+                .filterBy(Condition.not(Condition.attribute("href", PATH_DASHBOARD)));
+        if (!dashboardLinks.isEmpty()) {
+            SelenideElement dashboardLink = dashboardLinks.first();
             String dashboardHref = dashboardLink.getAttribute("href");
             if (dashboardHref != null && !dashboardHref.contains(PATH_DASHBOARD)) {
                 open(WebDriverRunner.url().replaceAll("#.*$", "") + dashboardHref);
@@ -76,6 +79,15 @@ public class DashboardPage extends BasePage {
                 Condition.text("LAUNCHES"),
                 Condition.text("INVESTIGATIONS")));
         return this;
+    }
+
+    public boolean isWidgetAreaVisible() {
+        try {
+            shouldSeeWidgetArea();
+            return true;
+        } catch (AssertionError error) {
+            return false;
+        }
     }
 
     public DashboardPage addAnyWidget() {

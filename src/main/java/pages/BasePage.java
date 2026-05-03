@@ -34,6 +34,15 @@ public abstract class BasePage {
         }
     }
 
+    protected boolean clickElementIfVisibleAndGetResult(String text) {
+        ElementsCollection visibleCandidates = $$(byClickableText(text)).filter(Condition.visible);
+        if (visibleCandidates.isEmpty()) {
+            return false;
+        }
+        visibleCandidates.first().click();
+        return true;
+    }
+
     protected boolean isBodyContainsText(String text) {
         return $(BODY).has(Condition.text(text));
     }

@@ -1,0 +1,75 @@
+name: CI-CD
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      RP_BASE_URL: https://demo.reportportal.io
+      RP_API_PREFIX: /api/v1
+      RP_PROJECT_NAME: default_personal
+      RP_LOGIN: ${{ secrets.RP_LOGIN }}
+      RP_PASSWORD: ${{ secrets.RP_PASSWORD }}
+      RP_TOKEN: ${{ secrets.RP_TOKEN }}
+      BROWSER: chrome
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run API Tests
+        run: mvn -B clean test -Dgroups=API
+
+      - name: Run UI Tests
+        run: xvfb-run -a mvn -B test -Dgroups=UI -Dbrowser=${BROWSER}
+
+      - name: Generate Allure Report
+        if: always()
+        run: mvn -B allure:report
+
+      - name: Upload Allure report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: target/site/allure-maven-plugin
+
+  deploy-allure:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Allure report artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-report
+          path: target/site/allure-maven-plugin
+
+      - name: Deploy Allure Report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: target/site/allure-maven-plugin

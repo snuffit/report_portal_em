@@ -55,6 +55,10 @@ public class LaunchesPage extends BasePage {
         return this;
     }
 
+    public boolean openLatestTabIfVisible() {
+        return clickElementIfVisibleAndGetResult(TEXT_TAB_LATEST_LAUNCHES);
+    }
+
     public LaunchesPage searchLaunch(String launchName) {
         SelenideElement input = $(SEARCH_INPUT);
         if (input.exists()) {
@@ -67,6 +71,15 @@ public class LaunchesPage extends BasePage {
     public LaunchesPage shouldContainText(String text) {
         shouldSeeTextInBody(text);
         return this;
+    }
+
+    public boolean waitUntilContainsText(String text) {
+        try {
+            shouldSeeTextInBody(text);
+            return true;
+        } catch (AssertionError error) {
+            return false;
+        }
     }
 
     public DashboardPage openDashboardPage() {

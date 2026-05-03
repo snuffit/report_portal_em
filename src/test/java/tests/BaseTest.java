@@ -2,9 +2,8 @@ package tests;
 
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.WebDriverRunner;
+import browser.BrowserSessionFactory;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import pages.LaunchesPage;
@@ -26,10 +25,7 @@ public class BaseTest {
         launchesApiSteps = new LaunchesApiSteps();
 
         if (requiresUiSession()) {
-            ChromeOptions options = new ChromeOptions();
-            options.addArguments("--start-maximized");
-            options.addArguments("--incognito");
-            driver = new ChromeDriver(options);
+            driver = BrowserSessionFactory.createSession();
             WebDriverRunner.setWebDriver(driver);
             loginStep = new LoginStep();
             launchesPage = new LaunchesPage();
