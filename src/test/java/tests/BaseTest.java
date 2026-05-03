@@ -3,6 +3,7 @@ package tests;
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.WebDriverRunner;
 import browser.BrowserSessionFactory;
+import io.qameta.allure.Allure;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -25,8 +26,10 @@ public class BaseTest {
         launchesApiSteps = new LaunchesApiSteps();
 
         if (requiresUiSession()) {
-            driver = BrowserSessionFactory.createSession();
-            WebDriverRunner.setWebDriver(driver);
+            Allure.step("Start browser session", () -> {
+                driver = BrowserSessionFactory.createSession();
+                WebDriverRunner.setWebDriver(driver);
+            });
             loginStep = new LoginStep();
             launchesPage = new LaunchesPage();
         }

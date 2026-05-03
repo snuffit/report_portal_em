@@ -1,11 +1,15 @@
 package api.client;
 
 import config.ApiConfig;
+import io.qameta.allure.Allure;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 
 import static io.restassured.RestAssured.given;
 
@@ -30,7 +34,7 @@ public class ApiClient {
                 .then()
                 .extract()
                 .response();
-        logResponse("GET", path, response);
+        logResponse("GET", path, response, null);
         return response;
     }
 
@@ -43,7 +47,7 @@ public class ApiClient {
                 .then()
                 .extract()
                 .response();
-        logResponse("POST", path, response);
+        logResponse("POST", path, response, body);
         return response;
     }
 
@@ -56,7 +60,7 @@ public class ApiClient {
                 .then()
                 .extract()
                 .response();
-        logResponse("PUT", path, response);
+        logResponse("PUT", path, response, body);
         return response;
     }
 
@@ -68,7 +72,7 @@ public class ApiClient {
                 .then()
                 .extract()
                 .response();
-        logResponse("DELETE", path, response);
+        logResponse("DELETE", path, response, null);
         return response;
     }
 
@@ -85,17 +89,30 @@ public class ApiClient {
                 .then()
                 .extract()
                 .response();
-        logResponse("GET", path, response);
+        logResponse("GET", path, response, null);
         return response;
     }
 
-    private void logResponse(String method, String path, Response response) {
-        logger.info(
-                "{} {} | status={} | body={}",
-                method,
-                path,
-                response.getStatusCode(),
-                response.getBody().asString()
-        );
+    private void logResponse(String method, String path, Response response, Object requestPayload) {
+        String body = response.getBody().asString();
+        int statusCode = response.getStatusCode();
+        logger.info("{} {} | status={} | body={}", method, path, statusCode, body);
+        Allure.step(method + " " + path + " → HTTP " + statusCode, stepContext -> {
+            stepContext.parameter("path", path);
+            stepContext.parameter("status", String.valueOf(statusCode));
+            if (requestPayload != null) {
+                String serialized = String.valueOf(requestPayload);
+                if (!serialized.isEmpty()) {
+                    Allure.addAttachment("Request payload", "application/json",
+                            new ByteArrayInputStream(serialized.getBytes(StandardCharsets.UTF_8)),
+                            ".json");
+                }
+            }
+            if (body != null && !body.isEmpty()) {
+                Allure.addAttachment("Response body", "application/json",
+                        new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)),
+                        ".json");
+            }
+        });
     }
 }

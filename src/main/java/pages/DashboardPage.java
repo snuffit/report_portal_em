@@ -4,6 +4,7 @@ import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import com.codeborne.selenide.WebDriverRunner;
+import io.qameta.allure.Allure;
 import org.openqa.selenium.By;
 
 import static com.codeborne.selenide.Selenide.$;
@@ -33,9 +34,11 @@ public class DashboardPage extends BasePage {
     private static final String REGEX_DASHBOARD_MARKERS = "(?is).*(dashboard|add\\s+new\\s+widget).*";
 
     public DashboardPage openPage() {
-        open(URL_DASHBOARD_PAGE);
-        shouldSeeBodyByPattern(REGEX_DASHBOARD_MARKERS);
-        return this;
+        return Allure.step("Open Dashboard page", () -> {
+            open(URL_DASHBOARD_PAGE);
+            shouldSeeBodyByPattern(REGEX_DASHBOARD_MARKERS);
+            return this;
+        });
     }
 
     public DashboardPage ensureDashboardExistsAndOpened() {
@@ -65,33 +68,36 @@ public class DashboardPage extends BasePage {
     }
 
     public WidgetCreationModal clickAddNewWidget() {
-        ensureDashboardExistsAndOpened();
-        if (isBodyMatchesPattern(REGEX_WIDGET_AREA_MARKERS)) {
-            clickElementByText(TEXT_ADD_NEW_WIDGET);
-        }
-        return new WidgetCreationModal();
+        return Allure.step("Open Add new widget flow", () -> {
+            ensureDashboardExistsAndOpened();
+            if (isBodyMatchesPattern(REGEX_WIDGET_AREA_MARKERS)) {
+                clickElementByText(TEXT_ADD_NEW_WIDGET);
+            }
+            return new WidgetCreationModal();
+        });
     }
 
-    public DashboardPage shouldSeeWidgetArea() {
+    private void assertWidgetAreaVisible() {
         $(BODY).shouldHave(Condition.or("widget markers",
                 Condition.text("Widget"),
                 Condition.text("Add New Dashboard"),
                 Condition.text("LAUNCHES"),
                 Condition.text("INVESTIGATIONS")));
-        return this;
     }
 
     public boolean isWidgetAreaVisible() {
-        try {
-            shouldSeeWidgetArea();
-            return true;
-        } catch (AssertionError error) {
-            return false;
-        }
+        return Allure.step("Check widget area is visible", () -> {
+            try {
+                assertWidgetAreaVisible();
+                return true;
+            } catch (AssertionError error) {
+                return false;
+            }
+        });
     }
 
     public DashboardPage addAnyWidget() {
-        return clickAddNewWidget()
-                .createDefaultWidget();
+        return Allure.step("Add any widget (wizard)", () -> clickAddNewWidget()
+                .createDefaultWidget());
     }
 }

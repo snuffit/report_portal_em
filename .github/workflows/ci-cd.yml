@@ -52,7 +52,7 @@ jobs:
           path: target/site/allure-maven-plugin
 
   deploy-allure:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: always()
     needs: test
     runs-on: ubuntu-latest
     permissions:

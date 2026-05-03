@@ -3,6 +3,7 @@
 <suite name="ReportPortalSuiteParallel" parallel="tests" thread-count="2">
     <listeners>
         <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
+        <listener class-name="tests.listeners.AllureFailureListener"/>
     </listeners>
     <test name="API Tests Parallel">
         <classes>
