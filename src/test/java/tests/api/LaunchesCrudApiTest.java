@@ -1,5 +1,6 @@
 package tests.api;
 
+import io.qameta.allure.Allure;
 import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -22,8 +23,9 @@ public class LaunchesCrudApiTest extends BaseTest {
         boolean createdAndDeletedCorrectly = finishResponse.getStatusCode() == 200
                 && deleteResponse.getStatusCode() == 200
                 && (statusAfterDelete == 404 || statusAfterDelete == 410);
-        Assert.assertTrue(createdAndDeletedCorrectly,
-                "Expected finish=200, delete=200 and launch absence=404 after deletion");
+        Allure.step("Assertion: launch finished, deleted, absent on subsequent GET", () ->
+                Assert.assertTrue(createdAndDeletedCorrectly,
+                        "Expected finish=200, delete=200 and launch absence=404 after deletion"));
     }
 
     @Test(description = "Read launch by id via API")
@@ -36,7 +38,8 @@ public class LaunchesCrudApiTest extends BaseTest {
 
         boolean launchIsReadable = getResponse.getStatusCode() == 200
                 && launchId.equals(getResponse.jsonPath().getString("id"));
-        Assert.assertTrue(launchIsReadable, "Launch should be available by id right after creation");
+        Allure.step("Assertion: launch readable by id after creation", () ->
+                Assert.assertTrue(launchIsReadable, "Launch should be available by id right after creation"));
     }
 
     @Test(description = "Update launch via API")
@@ -51,7 +54,8 @@ public class LaunchesCrudApiTest extends BaseTest {
 
         boolean launchUpdated = updateResponse.getStatusCode() == 200
                 && description.equals(getResponse.jsonPath().getString("description"));
-        Assert.assertTrue(launchUpdated, "Launch description should be updated via API");
+        Allure.step("Assertion: description updated via API", () ->
+                Assert.assertTrue(launchUpdated, "Launch description should be updated via API"));
     }
 
     @Test(description = "Delete launch via API")
@@ -66,7 +70,8 @@ public class LaunchesCrudApiTest extends BaseTest {
         boolean launchDeleted = finishResponse.getStatusCode() == 200
                 && deleteResponse.getStatusCode() == 200
                 && (statusAfterDelete == 404 || statusAfterDelete == 410);
-        Assert.assertTrue(launchDeleted, "Deleted launch should be unavailable on next read");
+        Allure.step("Assertion: deleted launch not returned by GET", () ->
+                Assert.assertTrue(launchDeleted, "Deleted launch should be unavailable on next read"));
     }
 
     @Test(description = "Get launches list with invalid token")
@@ -76,7 +81,8 @@ public class LaunchesCrudApiTest extends BaseTest {
 
         boolean invalidTokenHandled = response.getStatusCode() == 401
                 && (errorMessage.contains("error") || errorMessage.contains("unauthorized"));
-        Assert.assertTrue(invalidTokenHandled, "Invalid token request should return 401 with error message");
+        Allure.step("Assertion: invalid token yields 401 and error payload", () ->
+                Assert.assertTrue(invalidTokenHandled, "Invalid token request should return 401 with error message"));
     }
 
     @Test(description = "Get launches list with invalid project name")
@@ -89,7 +95,8 @@ public class LaunchesCrudApiTest extends BaseTest {
                 && (errorMessage.contains("error")
                 || errorMessage.contains("not found")
                 || errorMessage.contains("permissions"));
-        Assert.assertTrue(invalidProjectHandled,
-                "Invalid project request should return 403/404 with access error in response body");
+        Allure.step("Assertion: invalid project yields 403/404 and explanatory body", () ->
+                Assert.assertTrue(invalidProjectHandled,
+                        "Invalid project request should return 403/404 with access error in response body"));
     }
 }

@@ -2,6 +2,7 @@ package pages;
 
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
+import io.qameta.allure.Allure;
 import org.openqa.selenium.By;
 
 import static com.codeborne.selenide.Selenide.$$;
@@ -19,34 +20,44 @@ public class WidgetCreationModal extends BasePage {
     private static final String TEXT_ADD = "add";
 
     public WidgetCreationModal selectFirstWidgetType() {
-        ElementsCollection widgetTypeItems = $$(WIDGET_TYPE_ITEMS).filter(Condition.visible);
-        if (!widgetTypeItems.isEmpty()) {
-            widgetTypeItems.first().click();
-        }
-        return this;
+        return Allure.step("Widget wizard: select first widget type", () -> {
+            ElementsCollection widgetTypeItems = $$(WIDGET_TYPE_ITEMS).filter(Condition.visible);
+            if (!widgetTypeItems.isEmpty()) {
+                widgetTypeItems.first().click();
+            }
+            return this;
+        });
     }
 
     public WidgetCreationModal clickNext() {
-        clickElementIfVisible(TEXT_NEXT);
-        return this;
+        return Allure.step("Widget wizard: Next", () -> {
+            clickElementIfVisible(TEXT_NEXT);
+            return this;
+        });
     }
 
     public WidgetCreationModal clickSave() {
-        clickElementIfVisible(TEXT_SAVE);
-        return this;
+        return Allure.step("Widget wizard: Save", () -> {
+            clickElementIfVisible(TEXT_SAVE);
+            return this;
+        });
     }
 
     public WidgetCreationModal clickAdd() {
-        clickElementIfVisible(TEXT_ADD);
-        return this;
+        return Allure.step("Widget wizard: Add", () -> {
+            clickElementIfVisible(TEXT_ADD);
+            return this;
+        });
     }
 
     public DashboardPage createDefaultWidget() {
-        selectFirstWidgetType()
-                .clickNext()
-                .clickNext()
-                .clickSave()
-                .clickAdd();
-        return new DashboardPage();
+        return Allure.step("Widget wizard: complete default flow", () -> {
+            selectFirstWidgetType()
+                    .clickNext()
+                    .clickNext()
+                    .clickSave()
+                    .clickAdd();
+            return new DashboardPage();
+        });
     }
 }

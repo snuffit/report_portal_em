@@ -1,5 +1,6 @@
 package pages;
 
+import io.qameta.allure.Allure;
 import org.openqa.selenium.By;
 
 import static com.codeborne.selenide.Selenide.$;
@@ -16,14 +17,16 @@ public class LoginPage {
     private static final By LOGIN_BUTTON = By.cssSelector("button[type='submit']");
 
     public LoginPage openPage() {
-        open(URL_LOGIN);
-        return this;
+        return Allure.step("Open login page", () -> {
+            open(URL_LOGIN);
+            return this;
+        });
     }
 
     public LaunchesPage auth(String login, String password) {
-        return inputLogin(login)
+        return Allure.step("Submit credentials and open app", () -> inputLogin(login)
                 .inputPassword(password)
-                .clickLogin();
+                .clickLogin());
     }
 
     private LoginPage inputLogin(String login) {

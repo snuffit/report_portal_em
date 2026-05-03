@@ -2,6 +2,7 @@ package pages;
 
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
+import io.qameta.allure.Allure;
 import org.openqa.selenium.By;
 
 import static com.codeborne.selenide.Selenide.$;
@@ -27,62 +28,58 @@ public class LaunchesPage extends BasePage {
     private static final String REGEX_LAUNCHES_PAGE_MARKER = "(?is).*launches.*";
 
     public LaunchesPage openPage() {
-        open(URL_LAUNCHES_PAGE);
-        if ($(LAUNCHES_LINK).exists()) {
-            $(LAUNCHES_LINK).click();
-        }
-        shouldBeOpened();
-        return this;
+        return Allure.step("Open Launches (All) page", () -> {
+            open(URL_LAUNCHES_PAGE);
+            if ($(LAUNCHES_LINK).exists()) {
+                $(LAUNCHES_LINK).click();
+            }
+            shouldBeOpened();
+            return this;
+        });
     }
 
     public LaunchesPage shouldBeOpened() {
-        shouldSeeBodyByPattern(REGEX_LAUNCHES_PAGE_MARKER);
-        return this;
+        return Allure.step("Verify Launches page is open", () -> {
+            shouldSeeBodyByPattern(REGEX_LAUNCHES_PAGE_MARKER);
+            return this;
+        });
     }
 
     public LaunchesPage openAllTab() {
-        clickElementByText(TEXT_TAB_ALL_LAUNCHES);
-        return this;
-    }
-
-    public LaunchesPage openLatestTab() {
-        clickElementByText(TEXT_TAB_LATEST_LAUNCHES);
-        return this;
-    }
-
-    public LaunchesPage openLatestTabIfPresent() {
-        clickElementIfVisible(TEXT_TAB_LATEST_LAUNCHES);
-        return this;
+        return Allure.step("Open tab: All launches", () -> {
+            clickElementByText(TEXT_TAB_ALL_LAUNCHES);
+            return this;
+        });
     }
 
     public boolean openLatestTabIfVisible() {
-        return clickElementIfVisibleAndGetResult(TEXT_TAB_LATEST_LAUNCHES);
+        return Allure.step("Open tab: Latest launches (if visible)", () ->
+                clickElementIfVisibleAndGetResult(TEXT_TAB_LATEST_LAUNCHES));
     }
 
     public LaunchesPage searchLaunch(String launchName) {
-        SelenideElement input = $(SEARCH_INPUT);
-        if (input.exists()) {
-            input.shouldBe(Condition.visible).clear();
-            input.setValue(launchName);
-        }
-        return this;
-    }
-
-    public LaunchesPage shouldContainText(String text) {
-        shouldSeeTextInBody(text);
-        return this;
+        return Allure.step("Search launch: " + launchName, () -> {
+            SelenideElement input = $(SEARCH_INPUT);
+            if (input.exists()) {
+                input.shouldBe(Condition.visible).clear();
+                input.setValue(launchName);
+            }
+            return this;
+        });
     }
 
     public boolean waitUntilContainsText(String text) {
-        try {
-            shouldSeeTextInBody(text);
-            return true;
-        } catch (AssertionError error) {
-            return false;
-        }
+        return Allure.step("Wait for text in page body: " + text, () -> {
+            try {
+                shouldSeeTextInBody(text);
+                return true;
+            } catch (AssertionError error) {
+                return false;
+            }
+        });
     }
 
     public DashboardPage openDashboardPage() {
-        return new DashboardPage().openPage();
+        return Allure.step("Navigate to Dashboard", () -> new DashboardPage().openPage());
     }
 }
